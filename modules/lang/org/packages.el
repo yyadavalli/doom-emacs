@@ -105,3 +105,9 @@
     :pin "02140a294a8d0d15ca42a1956af794fd7ec18140"))
 (when (featurep! :lang rst)
   (package! ox-rst :pin "99fa790da55b57a3f2e9aa187493ba434a64250e"))
+
+;;; GTD
+(when (featurep! +gtd)
+  (package! org-edna)
+  (package! org-agenda-property)
+  (package! org-super-agenda))
