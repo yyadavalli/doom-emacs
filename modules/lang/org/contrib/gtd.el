@@ -6,7 +6,8 @@
 (use-package! org-edna
   :after org
   :config
-  (setq org-edna-use-inheritance t)
+  (setq org-edna-prompt-for-archive nil
+        org-edna-use-inheritance t)
   (org-edna-load))
 
 (use-package! org-agenda-property
@@ -21,12 +22,17 @@
   (setq org-agenda-custom-commands
         '(("d" "Daily Overview"
            ((agenda ""
-                    ((org-super-agenda-groups
-                      '((:name "Today" :time-grid t :scheduled t :order 1)
-                        (:name "Due Today" :deadline t :order 2)))))
+                    ((org-agenda-span 'day)
+                     (org-agenda-start-day nil)
+                     (org-super-agenda-groups
+                      '((:name "Today"
+                         :date today :time-grid t :scheduled today)
+                        (:name "Due Today" :deadline today :order 2)
+                        (:discard (:anything t))))))
             (alltodo ""
                      ((org-super-agenda-groups
-                       '((:name "Current actions" :todo "STRT" :order 1)
+                       '((:discard (:scheduled t))
+                         (:name "Current actions" :todo "STRT" :order 1)
                          (:name "Important" :priority "A" :order 2)
                          (:name "Overdue" :deadline past :face error :order 3)
                          (:name "Due Soon" :deadline future :order 4)
@@ -39,7 +45,9 @@
                          (:name "Incubating Projects"
                           :and (:tag "SOMEDAY" :todo "PROJ") :order 90)
                          (:name "Projects" :todo "PROJ" :order 10)
-                         (:discard (:tag ("PROJECT" "INBOX")))))))))
+                         (:discard (:tag "INBOX"))
+                         (:discard (:property ("PROJECT" "t")))))))))
+          ("i" "Inbox" ((tags-todo "INBOX")))
           ("p" "All projects" ((todo "PROJ")))
           ("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))))
   :hook (org-agenda-mode . org-super-agenda-mode)
@@ -47,17 +55,32 @@
   (setq org-super-agenda-header-map nil))
 
 ;;;###autoload
-(defun +org--add-projects-tags-and-properties ()
-  "Hook function to add the necessary properties and tags when a
-heading is makred as a project."
-  (when (string-equal org-state "PROJ")
-    (org-set-property "TRIGGER" "next-sibling todo-state!(STRT)")
-    (let ((current-tags (org-get-tags nil t)))
-      (org-set-tags (append '("PROJECT") current-tags)))))
+(defun +org--add-project-properties-h (change-plist)
+  "Hook function to change the properties when a heading is
+marked or unmarked as a project."
+  ;; Cleanup properties if the todo state is being moved from PROJ
+  (when (string-equal "PROJ" (plist-get change-plist :from))
+    (org-delete-property "TRIGGER")
+    (org-delete-property "PROJECT"))
+  ;; Add properties if the todo state is being moved from PROJ
+  (when (string-equal "PROJ" (plist-get change-plist :to))
+    (org-set-property "TRIGGER" "next-sibling todo!(STRT)")
+    (org-set-property "PROJECT" "t")))
+
+;;;###autoload
+(defun +org--deletated-to-h (change-plist)
+  "Hook function to add a property describing who a task is
+  delegated to."
+  (when (string-equal "WAIT" (plist-get change-plist :from))
+    (org-delete-property "DELEGATED_TO"))
+  (when (string-equal "WAIT" (plist-get change-plist :to))
+    (org-set-property "DELEGATED_TO" (read-string "Who will work on this? "))))
 
 (after! org
   (setq org-stuck-projects '("/+PROJ" ("STRT") ("SOMEDAY") ""))
-  (add-hook 'org-after-todo-state-change-hook '+org--add-projects-tags-and-properties))
+  (add-hook! 'org-trigger-hook
+             #'(+org--add-project-properties-h
+                +org--deletated-to-h)))
 
 (after! org-capture
   ;; Update the personal todo templates to match others
