@@ -54,6 +54,9 @@
   :config
   (setq org-super-agenda-header-map nil))
 
+(defvar +org-next-action-finder "next-sibling-wrap(todo-only)"
+  "Org EDNA finder string for finding the next action in a project")
+
 ;;;###autoload
 (defun +org--add-project-properties-h (change-plist)
   "Hook function to change the properties when a heading is
@@ -64,7 +67,8 @@ marked or unmarked as a project."
     (org-delete-property "PROJECT"))
   ;; Add properties if the todo state is being moved from PROJ
   (when (string-equal "PROJ" (plist-get change-plist :to))
-    (org-set-property "TRIGGER" "next-sibling todo!(STRT)")
+    (org-set-property "TRIGGER" (format "%s todo!(STRT)"
+                                        +org-next-action-finder))
     (org-set-property "PROJECT" "t")))
 
 ;;;###autoload
