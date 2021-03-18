@@ -37,18 +37,16 @@
                          (:name "Overdue" :deadline past :face error :order 3)
                          (:name "Due Soon" :deadline future :order 4)
                          (:name "Waiting" :todo ("WAIT" "HOLD") :order 5)
-                         (:name "Stuck Projects"
-                          :and (:todo "PROJ"
-                                :not (:tag "SOMEDAY")
-                                :not (:children "STRT"))
-                          :order 80)
-                         (:name "Incubating Projects"
-                          :and (:tag "SOMEDAY" :todo "PROJ") :order 90)
-                         (:name "Projects" :todo "PROJ" :order 10)
                          (:discard (:tag "INBOX"))
                          (:discard (:property ("PROJECT" "t")))))))))
           ("i" "Inbox" ((tags-todo "INBOX")))
-          ("p" "All projects" ((todo "PROJ")))
+          ("p" "All projects"
+           ((todo "PROJ|IDEA"
+                  ((org-super-agenda-groups
+                    '((:name "Stuck Projects"
+                       :and (:todo "PROJ" :not (:children "STRT")) :order 1)
+                      (:name "Incubating Projects" :todo "IDEA" :order 2)
+                      (:name "All Projects" :todo "PROJ" :order 3)))))))
           ("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))))
   :hook (org-agenda-mode . org-super-agenda-mode)
   :config
@@ -81,7 +79,7 @@ marked or unmarked as a project."
     (org-set-property "DELEGATED_TO" (read-string "Who will work on this? "))))
 
 (after! org
-  (setq org-stuck-projects '("/+PROJ" ("STRT") ("SOMEDAY") ""))
+  (setq org-stuck-projects '("/+PROJ" ("STRT") nil ""))
   (add-hook! 'org-trigger-hook
              #'(+org--add-project-properties-h
                 +org--deletated-to-h)))
