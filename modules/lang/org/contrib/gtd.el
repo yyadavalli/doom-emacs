@@ -37,9 +37,9 @@
                          (:name "Overdue" :deadline past :face error :order 3)
                          (:name "Due Soon" :deadline future :order 4)
                          (:name "Waiting" :todo ("WAIT" "HOLD") :order 5)
-                         (:discard (:tag "INBOX"))
+                         (:discard (:category "inbox"))
                          (:discard (:property ("PROJECT" "t")))))))))
-          ("i" "Inbox" ((tags-todo "INBOX")))
+          ("i" "Inbox" ((tags-todo "CATEGORY=\"inbox\"")))
           ("p" "All projects"
            ((todo "PROJ|IDEA"
                   ((org-super-agenda-groups
@@ -47,7 +47,12 @@
                        :and (:todo "PROJ" :not (:children "STRT")) :order 1)
                       (:name "Incubating Projects" :todo "IDEA" :order 2)
                       (:name "All Projects" :todo "PROJ" :order 3)))))))
-          ("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))))
+          ("n" "Agenda and all TODOs" ((agenda "") (alltodo ""))))
+        org-agenda-prefix-format
+        '((agenda . " %i %-16:c%?-12t% s")
+          (todo . " %i %-16:c")
+          (tags . " %i %-16:c")
+          (search . " %i %-16:c")))
   :hook (org-agenda-mode . org-super-agenda-mode)
   :config
   (setq org-super-agenda-header-map nil))
