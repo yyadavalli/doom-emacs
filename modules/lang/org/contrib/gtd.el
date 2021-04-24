@@ -25,18 +25,18 @@
                     ((org-agenda-span 'day)
                      (org-agenda-start-day nil)
                      (org-super-agenda-groups
-                      '((:name "Today"
-                         :date today :time-grid t :scheduled today)
+                      '((:name "Today" :date today :time-grid t :scheduled today)
                         (:name "Due Today" :deadline today :order 2)
                         (:discard (:anything t))))))
             (alltodo ""
                      ((org-super-agenda-groups
-                       '((:discard (:scheduled t))
-                         (:name "Current actions" :todo "STRT" :order 1)
+                       '((:name "Current actions" :todo "STRT" :order 1)
                          (:name "Important" :priority "A" :order 2)
-                         (:name "Overdue" :deadline past :face error :order 3)
+                         (:name "Overdue" :scheduled past :deadline past
+                          :face error :order 3)
                          (:name "Due Soon" :deadline future :order 4)
                          (:name "Waiting" :todo ("WAIT" "HOLD") :order 5)
+                         (:discard (:scheduled t))
                          (:discard (:category "inbox"))
                          (:discard (:property ("PROJECT" "t")))))))))
           ("i" "Inbox" ((tags-todo "CATEGORY=\"inbox\"")))
