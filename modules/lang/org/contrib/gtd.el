@@ -35,11 +35,16 @@
                          (:name "Overdue" :scheduled past :deadline past
                           :face error :order 3)
                          (:name "Due Soon" :deadline future :order 4)
-                         (:name "Waiting" :todo ("WAIT" "HOLD") :order 5)
+                         (:name "Waiting" :todo "WAIT" :order 5)
+                         (:name "Blocked" :todo "HOLD" :order 6)
                          (:discard (:scheduled t))
                          (:discard (:category "inbox"))
                          (:discard (:property ("PROJECT" "t")))))))))
-          ("i" "Inbox" ((tags-todo "CATEGORY=\"inbox\"")))
+          ("i" "Inbox"
+           ((tags "inbox"
+                  ((org-super-agenda-groups
+                    '((:discard (:heading-regexp "Inbox"))))
+                   (org-super-agenda-unmatched-name "")))))
           ("p" "All projects"
            ((todo "PROJ|IDEA"
                   ((org-super-agenda-groups
