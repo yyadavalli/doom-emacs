@@ -30,15 +30,15 @@
                         (:discard (:anything t))))))
             (alltodo ""
                      ((org-super-agenda-groups
-                       '((:name "Current actions" :todo "STRT" :order 1)
-                         (:name "Important" :priority "A" :order 2)
-                         (:name "Overdue" :scheduled past :deadline past
+                       '((:name "Overdue" :scheduled past :deadline past
                           :face error :order 3)
                          (:name "Due Soon" :deadline future :order 4)
+                         (:discard (:scheduled t))
+                         (:discard (:tag "inbox"))
+                         (:name "Current actions" :todo "STRT" :order 1)
+                         (:name "Important" :priority "A" :order 2)
                          (:name "Waiting" :todo "WAIT" :order 5)
                          (:name "Blocked" :todo "HOLD" :order 6)
-                         (:discard (:scheduled t))
-                         (:discard (:category "inbox"))
                          (:discard (:property ("PROJECT" "t")))))))))
           ("i" "Inbox"
            ((tags "inbox"
